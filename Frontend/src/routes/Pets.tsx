@@ -7,7 +7,10 @@ interface Pet {
   Species: string;
   Date_Of_Birth: string;
   Owner_ID: number;
-  Owner_Name: string;
+  owner: {
+    Owner_ID: number;
+    Owner_Name: string;
+  };
 }
 
 export default function Pets() {
@@ -75,7 +78,7 @@ export default function Pets() {
                 <td className="border-b px-4 py-2">{pet.Breed}</td>
                 <td className="border-b px-4 py-2">{pet.Species}</td>
                 <td className="border-b px-4 py-2">{new Date(pet.Date_Of_Birth).toLocaleDateString()}</td>
-                <td className="border-b px-4 py-2">{pet.Owner_Name}</td>
+                <td className="border-b px-4 py-2">{pet.owner.Owner_Name}</td>
               </tr>
             ))}
           </tbody>

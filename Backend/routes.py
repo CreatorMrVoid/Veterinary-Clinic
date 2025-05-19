@@ -32,9 +32,11 @@ def create_owner(owner: schemas.OwnerCreate, db: Session = Depends(get_db)):
     return db_owner
 
 # Pet routes
-@router.get("/pets/", response_model=List[schemas.Pet])
+@router.get("/pets/", response_model=List[schemas.PetWithOwner])
 def get_pets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    pets = db.query(models.Pet).offset(skip).limit(limit).all()
+    pets = db.query(models.Pet)\
+        .join(models.Owner, models.Pet.Owner_ID == models.Owner.Owner_ID)\
+        .offset(skip).limit(limit).all()
     return pets
 
 @router.get("/pets/{pet_id}", response_model=schemas.PetWithDetails)
