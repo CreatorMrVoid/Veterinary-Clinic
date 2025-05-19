@@ -20,7 +20,7 @@ class Pet(Base):
     Pet_Name = Column(String(100))
     Breed = Column(String(100))
     Species = Column(String(100))
-    Dte_Of_Birth = Column(Date)
+    Date_Of_Birth = Column(Date)
     Owner_ID = Column(Integer, ForeignKey("owner.Owner_ID"))
 
     owner = relationship("Owner", back_populates="pets")

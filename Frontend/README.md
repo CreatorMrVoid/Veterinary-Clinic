@@ -22,6 +22,8 @@ A modern veterinary management system built with Remix.
 2. Install dependencies:
 ```bash
 npm install
+
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
 ```
 
 ### Development
@@ -75,7 +77,10 @@ Install the dependencies:
 
 ```bash
 npm install
+
+npm install @mui/material @emotion/react @emotion/styled @mui/icons-material
 ```
+
 
 ### Development
 

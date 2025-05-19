@@ -31,7 +31,7 @@ DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=vet_clinic_db
 
-### 2.Install the requirements:
+### 2.Install the requirements (be sure you are in the backend folder -cd backend-):
 ```bash
 pip install -r requirements.txt
 ```

@@ -23,7 +23,7 @@ class PetBase(BaseModel):
     Pet_Name: str
     Breed: str
     Species: str
-    Dte_Of_Birth: date
+    Date_Of_Birth: date
     Owner_ID: int
 
 class PetCreate(PetBase):
@@ -70,6 +70,13 @@ class Appointment(AppointmentBase):
     class Config:
         from_attributes = True
 
+class AppointmentWithDetails(Appointment):
+    pet: Pet
+    vet: Veterinarian
+
+    class Config:
+        from_attributes = True 
+
 # Vaccination schemas
 class VaccinationBase(BaseModel):
     Pet_ID: int
@@ -101,4 +108,4 @@ class VeterinarianWithAppointments(Veterinarian):
     appointments: List[Appointment]
 
 class VeterinarianWithVaccinations(Veterinarian):
-    vaccinations: List[Vaccination] 
+    vaccinations: List[Vaccination]

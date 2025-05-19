@@ -8,6 +8,7 @@ import schemas
 from database import get_db
 
 router = APIRouter()
+# This routes includes parts for feature development. Like add owner, display a owner's pets.
 
 # Owner routes
 @router.get("/owners/", response_model=List[schemas.Owner])
@@ -83,9 +84,12 @@ def create_veterinarian(vet: schemas.VeterinarianCreate, db: Session = Depends(g
     return db_vet
 
 # Appointment routes
-@router.get("/appointments/", response_model=List[schemas.Appointment])
+@router.get("/appointments/", response_model=List[schemas.AppointmentWithDetails])
 def get_appointments(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    appointments = db.query(models.Appointment).offset(skip).limit(limit).all()
+    appointments = db.query(models.Appointment)\
+        .join(models.Pet, models.Appointment.Pet_ID == models.Pet.Pet_ID)\
+        .join(models.Veterinarian, models.Appointment.Vet_ID == models.Veterinarian.Vet_ID)\
+        .offset(skip).limit(limit).all()
     return appointments
 
 @router.get("/appointments/{app_id}", response_model=schemas.Appointment)
