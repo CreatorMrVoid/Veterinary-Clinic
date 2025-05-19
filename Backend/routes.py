@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 import models
@@ -111,28 +111,64 @@ def create_appointment(appointment: schemas.AppointmentCreate, db: Session = Dep
 
 # Vaccination routes
 @router.get("/vaccinations/", response_model=List[schemas.Vaccination])
-def get_vaccinations(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    vaccinations = db.query(models.Vaccination).offset(skip).limit(limit).all()
-    return vaccinations
+def get_vaccinations(pet_id: Optional[int] = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    try:
+        query = db.query(models.Vaccination)
+        
+        if pet_id is not None:
+            query = query.filter(models.Vaccination.Pet_ID == pet_id)
+        
+        vaccinations = query.offset(skip).limit(limit).all()
+        
+        # If no vaccinations found, return empty list instead of error
+        if not vaccinations:
+            return []
+            
+        return vaccinations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/pets/{pet_id}/vaccinations", response_model=List[schemas.Vaccination])
+def get_pet_vaccinations(pet_id: int, db: Session = Depends(get_db)):
+    try:
+        # First check if pet exists
+        pet = db.query(models.Pet).filter(models.Pet.Pet_ID == pet_id).first()
+        if not pet:
+            raise HTTPException(status_code=404, detail="Pet not found")
+            
+        vaccinations = db.query(models.Vaccination)\
+            .filter(models.Vaccination.Pet_ID == pet_id)\
+            .order_by(models.Vaccination.Vacc_Date.desc())\
+            .all()
+            
+        return vaccinations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/vaccinations/{vacc_id}", response_model=schemas.Vaccination)
 def get_vaccination(vacc_id: int, db: Session = Depends(get_db)):
-    vaccination = db.query(models.Vaccination).filter(models.Vaccination.Vacc_ID == vacc_id).first()
-    if vaccination is None:
-        raise HTTPException(status_code=404, detail="Vaccination not found")
-    return vaccination
+    try:
+        vaccination = db.query(models.Vaccination).filter(models.Vaccination.Vacc_ID == vacc_id).first()
+        if vaccination is None:
+            raise HTTPException(status_code=404, detail="Vaccination not found")
+        return vaccination
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/pets/{pet_id}/next-vaccination", response_model=schemas.Vaccination)
 def get_next_vaccination(pet_id: int, db: Session = Depends(get_db)):
-    today = date.today()
-    vaccination = db.query(models.Vaccination)\
-        .filter(models.Vaccination.Pet_ID == pet_id)\
-        .filter(models.Vaccination.Next_Due_Dates >= today)\
-        .order_by(models.Vaccination.Next_Due_Dates)\
-        .first()
-    if vaccination is None:
-        raise HTTPException(status_code=404, detail="No upcoming vaccinations found")
-    return vaccination
+    try:
+        today = date.today()
+        vaccination = db.query(models.Vaccination)\
+            .filter(models.Vaccination.Pet_ID == pet_id)\
+            .filter(models.Vaccination.Next_Due_Dates >= today)\
+            .order_by(models.Vaccination.Next_Due_Dates)\
+            .first()
+        if vaccination is None:
+            raise HTTPException(status_code=404, detail="No upcoming vaccinations found")
+        return vaccination
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/vaccinations/", response_model=schemas.Vaccination)
 def create_vaccination(vaccination: schemas.VaccinationCreate, db: Session = Depends(get_db)):

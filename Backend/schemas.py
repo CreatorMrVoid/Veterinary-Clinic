@@ -80,10 +80,10 @@ class AppointmentWithDetails(Appointment):
 # Vaccination schemas
 class VaccinationBase(BaseModel):
     Pet_ID: int
-    Vet_ID: int
+    Vet_ID: Optional[int] = None
     Name_Vaccine: str
-    Vacc_Date: date
-    Next_Due_Dates: date
+    Vacc_Date: Optional[date] = None
+    Next_Due_Dates: Optional[date] = None
     Notes_Vaccination: Optional[str] = None
 
 class VaccinationCreate(VaccinationBase):
